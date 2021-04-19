@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(map_tf_test)
+project(map_tf)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,19 +9,16 @@ project(map_tf_test)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  map_tf
   message_generation
   move_base_msgs
   nav_msgs
   roscpp
   rospy
   rostime
-  sensor_msgs
   std_msgs
+  sensor_msgs
   tf
 )
-### ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
-### 依存パッケージとしてmap_tfしていすればOK
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -80,7 +77,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   geometry_msgs#   move_base_msgs#   sensor_msgs#   std_msgs
+#   geometry_msgs#   move_base_msgs#   nav_msgs#   std_msgs#   sensor_msgs
 # )
 
 ################################################
@@ -112,10 +109,13 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
+
+###☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+###ここにライブラリのパスやらを自動解決できるようにする
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES map_tf_test
-#  CATKIN_DEPENDS geometry_msgs map_tf message_generation move_base_msgs nav_msgs roscpp rospy rostime sensor_msgs std_msgs tf
+  INCLUDE_DIRS include
+  LIBRARIES map_tf
+  CATKIN_DEPENDS geometry_msgs #message_generation move_base_msgs nav_msgs roscpp rospy rostime std_msgs sensor_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -125,14 +125,17 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
+
+###☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆
+###インクルードするヘッダファイルの場所を指定
 include_directories(
-# include
+ include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/map_tf_test.cpp
+#   src/${PROJECT_NAME}/map_tf.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -143,7 +146,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/map_tf_test_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/map_tf_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -207,7 +210,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_map_tf_test.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_map_tf.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
@@ -215,6 +218,12 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(map_tf_test_pkg src/map_tf_test_pkg.cpp)
-add_dependencies(map_tf_test_pkg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(map_tf_test_pkg ${catkin_LIBRARIES})
+find_package(OpenCV REQUIRED)
+add_library(map_tf src/map_tf.cpp)
+target_link_libraries(map_tf ${catkin_LIBRARIES} ${OpenCV_LIBS})
+### ライブラリの作成
+
+add_executable(map_tf_node main/map_tf_node.cpp)
+add_dependencies(map_tf_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(map_tf_node map_tf ${catkin_LIBRARIES})
+### map_tfを追加

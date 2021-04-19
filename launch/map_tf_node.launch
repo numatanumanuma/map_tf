@@ -1,0 +1,24 @@
+<launch>
+
+   <param name="/use_sim_time" value="true"/>
+   <include file="$(find navigation_stage)/move_base_config/move_base.xml"/>
+
+   <!-- map_server -->
+   <node name="map_server" pkg="map_server" type="map_server" args="$(find stage_navigator)/map/willow_map.yaml" respawn="false" />
+
+   <!--stage_ros-->
+   <node pkg="stage_ros" type="stageros" name="stageros" 
+          args="$(find stage_ros)/world/willow-erratic.world" respawn="false" >
+      <param name="base_watchdog_timeout" value="0.2"/>
+   </node>
+
+   <include file="$(find navigation_stage)/move_base_config/amcl_node.xml"/>  
+
+   <!-- cmd_vel -->
+   <node name="teleop_turtle" pkg="turtlesim" type="turtle_teleop_key" >
+      <remap from="turtle1/cmd_vel" to="cmd_vel"/>
+   </node>
+
+    <node name="map_tf_node" pkg="map_tf" type="map_tf_node" output="screen"/>
+
+</launch>
