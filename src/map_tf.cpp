@@ -24,24 +24,25 @@ void mapTF::msgsCallback(const nav_msgs::OccupancyGrid::ConstPtr& map){
     ROS_INFO("height:%d", height);
     ROS_INFO("resolution:%f", resolution);
 
-    image = cv::Mat::zeros(cv::Size(map->info.width,map->info.height), CV_8UC1);
+    image = cv::Mat::zeros(cv::Size(width,height), CV_8UC1);
 
-    for (unsigned int y = 0; y < map->info.height; y++){
-        for (unsigned int x = 0; x < map->info.width; x++){
-            unsigned int i = x + (map->info.height - y - 1) * map->info.width;
+    for (unsigned int y = 0; y < height; y++){
+        for (unsigned int x = 0; x < width; x++){
+            unsigned int i = x + (height - y - 1) * width;
             int intensity=205;
             if (map->data[i] >= 0 && map->data[i] <=100)
             intensity= round((float)(100.0-map->data[i])*2.55);
             image.at<unsigned char>(y, x)=intensity;
         }
     }
+    // dot_image = image;
     get_map = true;
 }
 
 void mapTF::timerCallback(const ros::TimerEvent&){
     // printNowpoint();
 }
-1
+
 void mapTF::getNowPoint(Point2D& p){ 
     //現在地を取得
     //中心が原点の座標系(m, rad)

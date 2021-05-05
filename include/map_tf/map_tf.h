@@ -30,7 +30,8 @@ public:
     double resolution;
     bool get_map;
     cv::Mat image;
-    //参照渡し const
+    cv::Mat3b dot_image;
+
     void printNowPoint();
    
 private:
@@ -40,6 +41,7 @@ private:
     tf::TransformListener tf_listener_;
     std::string image_path_;
     std::string map_topic_;
+
 };
 
 #endif
