@@ -35,7 +35,7 @@ void mapTF::msgsCallback(const nav_msgs::OccupancyGrid::ConstPtr& map){
             image.at<unsigned char>(y, x)=intensity;
         }
     }
-    // dot_image = image;
+    cv::cvtColor(image, image, CV_GRAY2BGR);
     get_map = true;
 }
 
@@ -43,9 +43,11 @@ void mapTF::timerCallback(const ros::TimerEvent&){
     // printNowpoint();
 }
 
+/*
+ 現在地を取得
+ 中心が原点の座標系(m, rad)
+*/
 void mapTF::getNowPoint(Point2D& p){ 
-    //現在地を取得
-    //中心が原点の座標系(m, rad)
     try{
         tf::StampedTransform trans;
         tf_listener_.waitForTransform("map", "base_link", 
@@ -65,21 +67,18 @@ void mapTF::getNowPoint(Point2D& p){
     return;
 }
 
+/* map座標を(m)から(pixel)に変換また原点を左上の座標系にする */
 void mapTF::pointToPixel(Point2D& p){
-    // map座標を(m)から(pixel)に変換また原点を左上の座標系にする
     p.x_p = (p.x + width / 2 * resolution) / resolution;
     p.y_p = (p.y - height / 2 * resolution) / resolution * -1;
     p.yaw_p = p.yaw * -1;
     return;
 }
 
+/* 現在地を出力 */
 void mapTF::printNowPoint(){
-    // 現在地を出力
     Point2D p;
     getNowPoint(p);
     ROS_INFO("Now...%lf, %lf\n%d, %d", p.x, p.y, p.x_p, p.y_p);
     return;
 }
-   // if (!map_.get_map){
-    //     return;
-    // }
